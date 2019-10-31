@@ -1,241 +1,343 @@
+package com.yazty;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 public class Yatzy {
 
-    public static int chance(int d1, int d2, int d3, int d4, int d5)
-    {
-        int total = 0;
-        total += d1;
-        total += d2;
-        total += d3;
-        total += d4;
-        total += d5;
-        return total;
+    /**
+     * la variable n'est utilisée
+     * que dans la classe pas besoin de protected
+     */
+    private int[] dice;
+
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * utiliser IntStream de java 8
+     */
+    public Yatzy(int d1, int d2, int d3, int d4, int d5) {
+
+        dice = IntStream.of(d1, d2, d3, d4, d5).toArray();
+
     }
 
-    public static int yatzy(int... dice)
-    {
-        int[] counts = new int[6];
-        for (int die : dice)
-            counts[die-1]++;
-        for (int i = 0; i != 6; i++)
-            if (counts[i] == 5)
-                return 50;
-        return 0;
+    /**
+     *
+     *  dès que la condition n'est pas
+     *  vérifiée on sort du stream
+     *  Short circuiting
+     */
+    public static int yatzy(int... dice) {
+        final boolean isYatzy = Arrays.stream(dice)
+                .allMatch(Integer.valueOf(dice[0])::equals);
+        return isYatzy ? 50 : 0;
+
     }
 
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * l'opération finale sum retourne la somme
+     * de tous les élément du IntStream
+     */
+    public static int chance(int d1, int d2, int d3, int d4, int d5) {
+        return IntStream.of(d1, d2, d3, d4, d5)
+                .sum();
+
+    }
+
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * retourne la somme des dés occurence == 1
+     */
     public static int ones(int d1, int d2, int d3, int d4, int d5) {
-        int sum = 0;
-        if (d1 == 1) sum++;
-        if (d2 == 1) sum++;
-        if (d3 == 1) sum++;
-        if (d4 == 1) sum++;
-        if (d5 == 1) 
-            sum++;
+        return getSumOfOccurences(1, d1, d2, d3, d4, d5);
 
-        return sum;
     }
 
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * retourne la somme des dés occurence == 2
+     */
     public static int twos(int d1, int d2, int d3, int d4, int d5) {
-        int sum = 0;
-        if (d1 == 2) sum += 2;
-        if (d2 == 2) sum += 2;
-        if (d3 == 2) sum += 2;
-        if (d4 == 2) sum += 2;
-        if (d5 == 2) sum += 2;
-        return sum;
+
+        return getSumOfOccurences(2, d1, d2, d3, d4, d5);
     }
 
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * retourne la somme des dés occurence == 3
+     */
     public static int threes(int d1, int d2, int d3, int d4, int d5) {
-        int s;    
-        s = 0;
-        if (d1 == 3) s += 3;
-        if (d2 == 3) s += 3;
-        if (d3 == 3) s += 3;
-        if (d4 == 3) s += 3;
-        if (d5 == 3) s += 3;
-        return s;
+        return getSumOfOccurences(3, d1, d2, d3, d4, d5);
     }
 
-    protected int[] dice;
-    public Yatzy(int d1, int d2, int d3, int d4, int _5)
-    {
-        dice = new int[5];
-        dice[0] = d1;
-        dice[1] = d2;
-        dice[2] = d3;
-        dice[3] = d4;
-        dice[4] = _5;
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * retourne la somme des dés occurence == 4
+     */
+    public int fours() {
+        return getSumOfOccurences(4, dice);
+
+    }
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * retourne la somme des dés occurence == 5
+     */
+    public int fives() {
+
+        return getSumOfOccurences(5, dice);
+    }
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * retourne la somme des dés occurence == 6
+     */
+    public int sixes() {
+
+        return getSumOfOccurences(6, dice);
     }
 
-    public int fours()
-    {
-        int sum;    
-        sum = 0;
-        for (int at = 0; at != 5; at++) {
-            if (dice[at] == 4) {
-                sum += 4;
-            }
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * la méthode getNOfAKind retourne une collection
+     * max retourne la valeur maximale de cette collection
+     * 2 * car on cherche la somme des doublons
+     * orElse retourne 0 si la condition n'est pas valide
+     */
+    public static int score_pair(int d1, int d2, int d3, int d4, int d5) {
+
+
+        return 2 * IntStream.of(getNOfAKind(2, d1, d2, d3, d4, d5))
+                .max()
+                .orElse(0);
+    }
+
+    /**
+     * retourne la somme des dés qui valident la condition (==valueToCheck)
+     * la methode sum retourne par defaut 0
+     */
+    private static int getSumOfOccurences(int valueToCheck, int... dices) {
+        return IntStream.of(dices)
+                .filter(value -> value == valueToCheck)
+                .sum();
+
+    }
+
+    /**
+     * retourne combien de fois
+     * chaque valeur se répéte
+     * en la plaçant dans la case qui correspond
+     * à sa valeur (par exemple 3 va la placer dans la 3 ème
+     * case du tableau == t[2] car le tableau commence par indexe 0)
+     * par exemple pour 3,4,3,5,6 en input donne le tableau {0,0,2,1,1,1}
+     */
+    private static int[] getCounts(int d1, int d2, int d3, int d4, int d5) {
+        int[] counts = new int[6];
+        IntStream.of(d1, d2, d3, d4, d5)
+                .forEach(d -> counts[d - 1]++);
+        return counts;
+    }
+
+    /**
+     *
+     * @param n
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     *restitue les valeurs qui se repetent au moins n fois
+     * le range correspond à la taille du tableau (startInclusive, endExclusive)
+     * ordonné sequentiellement
+     *filter garde uniquement les indexes dont les valeurs se repetent n fois ou plus
+     * map rajoute 1 à l'indexe du tableau filtré pour avoir la valeur réelle du dé
+     * l'exemple précédant du getCounts
+     * pour 3,4,3,5,6 en input donne le tableau {0,0,2,1,1,1}
+     * le filter avec n==2 par exemple donne : {2}
+     * le map donne : {3}
+     */
+    private static int[] getNOfAKind(int n, int d1, int d2, int d3, int d4, int d5) {
+
+        return IntStream.range(0, 6)
+                .filter(i -> getCounts(d1, d2, d3, d4, d5)[i] >= n)
+                .map(i -> i + 1)
+                .toArray();
+
+    }
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * la méthode getNOfAKind retourne une collection
+     * des valeurs en doublon n==2. cette collection doit
+     * avoir deux éléments pour avoir deux paires
+     * ==2 car cinq paramètres on peut avoir 2 doublon au maximum
+     * 2 * car on cherche la somme des doublons
+     * : 0 si pas de paires de doublons
+     */
+    public static int two_pair(int d1, int d2, int d3, int d4, int d5) {
+        return getNOfAKind(2, d1, d2, d3, d4, d5).length == 2 ?
+                IntStream.of(getNOfAKind(2, d1, d2, d3, d4, d5)).map(value -> 2 * value).sum() : 0;
+
+    }
+
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * la méthode getNOfAKind retourne une collection
+     * des valeurs en quadri n==4. cette collection doit
+     * avoir deux éléments pour avoir deux paires
+     * >0 car cinq paramètres on peut avoir 1 quadri
+     * 4 * car on cherche la somme des quadri
+     * : 0 si pas de quadri
+     */
+    public static int four_of_a_kind(int d1, int d2, int d3, int d4, int d5) {
+        return getNOfAKind(4, d1, d2, d3, d4, d5).length > 0 ? 4 * getNOfAKind(4, d1, d2, d3, d4, d5)[0] : 0;
+    }
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * la méthode getNOfAKind retourne une collection
+     * des valeurs en triplet n==3. cette collection doit
+     * avoir deux éléments pour avoir deux paires
+     * >0 car cinq paramètres on peut avoir 1 triplet
+     * 3 * car on cherche la somme des triplet
+     * : 0 si pas de triplet
+     */
+    public static int three_of_a_kind(int d1, int d2, int d3, int d4, int d5) {
+        return getNOfAKind(3, d1, d2, d3, d4, d5).length > 0 ? 3 * getNOfAKind(3, d1, d2, d3, d4, d5)[0] : 0;
+
+    }
+
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * pour {1,2,3,4,5} get count donne {1,1,1,1,1}
+     * range garantie que le stream est ordonné
+     * ==1 vérifie que chaque élément se repéte une seule fois
+     * length ==5 la taille du tableau ==5
+     * donc ne peut être que {1,2,3,4,5}
+     */
+    public static int smallStraight(int d1, int d2, int d3, int d4, int d5) {
+        return IntStream.range(0, 5)
+                .filter(i -> getCounts(d1, d2, d3, d4, d5)[i] == 1)
+                .toArray().length == 5 ? 15 : 0;
+
+    }
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * la même logique que smallStraight
+     * sauf que le range commence 1 pour eliminer
+     * le premier enregistrement du tableau et donc le 1
+     */
+    public static int largeStraight(int d1, int d2, int d3, int d4, int d5) {
+        return IntStream.range(1, 6)
+                .filter(i -> getCounts(d1, d2, d3, d4, d5)[i] == 1)
+                .toArray().length == 5 ? 20 : 0;
+    }
+
+    /**
+     *
+     * @param d1
+     * @param d2
+     * @param d3
+     * @param d4
+     * @param d5
+     * @return
+     * je récupère les triplets et les doublons
+     * sur 5 dès la seule combinaison gagnante est un tripet + un doublon
+     * sinon 0
+     *kindThree[0] == pairs[0] ? pairs[1] : pairs[0] car la méthode
+     * getNOfAKind remonte aussi les triplet comme doublons
+     * par exemple {2,2,2,6,6} -> pairs = {2,6} et kindThree = {6}
+     * et vue que 6 est déjà dans les triplets donc il ne faut pas la compter
+     * dans les doublons
+     */
+    public static int fullHouse(int d1, int d2, int d3, int d4, int d5) {
+        int[] kindThree = getNOfAKind(3, d1, d2, d3, d4, d5);
+        int[] pairs = getNOfAKind(2, d1, d2, d3, d4, d5);
+
+        if (kindThree.length != 1 || pairs.length != 2) {
+            return 0;
         }
-        return sum;
-    }
-
-    public int fives()
-    {
-        int s = 0;
-        int i;
-        for (i = 0; i < dice.length; i++) 
-            if (dice[i] == 5)
-                s = s + 5;
-        return s;
-    }
-
-    public int sixes()
-    {
-        int sum = 0;
-        for (int at = 0; at < dice.length; at++) 
-            if (dice[at] == 6)
-                sum = sum + 6;
-        return sum;
-    }
-
-    public static int score_pair(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] counts = new int[6];
-        counts[d1-1]++;
-        counts[d2-1]++;
-        counts[d3-1]++;
-        counts[d4-1]++;
-        counts[d5-1]++;
-        int at;
-        for (at = 0; at != 6; at++)
-            if (counts[6-at-1] >= 2)
-                return (6-at)*2;
-        return 0;
-    }
-
-    public static int two_pair(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] counts = new int[6];
-        counts[d1-1]++;
-        counts[d2-1]++;
-        counts[d3-1]++;
-        counts[d4-1]++;
-        counts[d5-1]++;
-        int n = 0;
-        int score = 0;
-        for (int i = 0; i < 6; i += 1)
-            if (counts[6-i-1] >= 2) {
-                n++;
-                score += (6-i);
-            }        
-        if (n == 2)
-            return score * 2;
-        else
-            return 0;
-    }
-
-    public static int four_of_a_kind(int _1, int _2, int d3, int d4, int d5)
-    {
-        int[] tallies;
-        tallies = new int[6];
-        tallies[_1-1]++;
-        tallies[_2-1]++;
-        tallies[d3-1]++;
-        tallies[d4-1]++;
-        tallies[d5-1]++;
-        for (int i = 0; i < 6; i++)
-            if (tallies[i] >= 4)
-                return (i+1) * 4;
-        return 0;
-    }
-
-    public static int three_of_a_kind(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] t;
-        t = new int[6];
-        t[d1-1]++;
-        t[d2-1]++;
-        t[d3-1]++;
-        t[d4-1]++;
-        t[d5-1]++;
-        for (int i = 0; i < 6; i++)
-            if (t[i] >= 3)
-                return (i+1) * 3;
-        return 0;
-    }
-
-    public static int smallStraight(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] tallies;
-        tallies = new int[6];
-        tallies[d1-1] += 1;
-        tallies[d2-1] += 1;
-        tallies[d3-1] += 1;
-        tallies[d4-1] += 1;
-        tallies[d5-1] += 1;
-        if (tallies[0] == 1 &&
-            tallies[1] == 1 &&
-            tallies[2] == 1 &&
-            tallies[3] == 1 &&
-            tallies[4] == 1)
-            return 15;
-        return 0;
-    }
-
-    public static int largeStraight(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] tallies;
-        tallies = new int[6];
-        tallies[d1-1] += 1;
-        tallies[d2-1] += 1;
-        tallies[d3-1] += 1;
-        tallies[d4-1] += 1;
-        tallies[d5-1] += 1;
-        if (tallies[1] == 1 &&
-            tallies[2] == 1 &&
-            tallies[3] == 1 &&
-            tallies[4] == 1
-            && tallies[5] == 1)
-            return 20;
-        return 0;
-    }
-
-    public static int fullHouse(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] tallies;
-        boolean _2 = false;
-        int i;
-        int _2_at = 0;
-        boolean _3 = false;
-        int _3_at = 0;
-
-
-
-
-        tallies = new int[6];
-        tallies[d1-1] += 1;
-        tallies[d2-1] += 1;
-        tallies[d3-1] += 1;
-        tallies[d4-1] += 1;
-        tallies[d5-1] += 1;
-
-        for (i = 0; i != 6; i += 1)
-            if (tallies[i] == 2) {
-                _2 = true;
-                _2_at = i+1;
-            }
-
-        for (i = 0; i != 6; i += 1)
-            if (tallies[i] == 3) {
-                _3 = true;
-                _3_at = i+1;
-            }
-
-        if (_2 && _3)
-            return _2_at * 2 + _3_at * 3;
-        else
-            return 0;
+        return 3 * kindThree[0] + 2 * (kindThree[0] == pairs[0] ? pairs[1] : pairs[0]);
     }
 }
-
-
-
