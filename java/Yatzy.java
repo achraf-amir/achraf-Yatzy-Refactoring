@@ -100,13 +100,7 @@ public class Yatzy {
         return getSumOfOccurences(3, d1, d2, d3, d4, d5);
     }
 
-    /**
-     *
-     * @param d1
-     * @param d2
-     * @param d3
-     * @param d4
-     * @param d5
+    /**    
      * @return
      * retourne la somme des dés occurence == 4
      */
@@ -115,12 +109,7 @@ public class Yatzy {
 
     }
     /**
-     *
-     * @param d1
-     * @param d2
-     * @param d3
-     * @param d4
-     * @param d5
+     *    
      * @return
      * retourne la somme des dés occurence == 5
      */
@@ -128,13 +117,7 @@ public class Yatzy {
 
         return getSumOfOccurences(5, dice);
     }
-    /**
-     *
-     * @param d1
-     * @param d2
-     * @param d3
-     * @param d4
-     * @param d5
+    /**  
      * @return
      * retourne la somme des dés occurence == 6
      */
